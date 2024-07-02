@@ -178,13 +178,15 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 
 	_retargetFile() {
 		const selectValue = this.$['select'].value;
+		let file;
 		if (selectValue === 'none') {
-			this['_cueRef'].file = null;
+			file = null;
 		} else if (selectValue === 'default') {
-			this['_cueRef'].file = this['defaultFile'];
+			file = this['defaultFile'];
 		} else {
-			this['_cueRef'].file = this['soundFiles'][this.$['select'].selectedOptions[0].replicantIndex];
+			file = this['soundFiles'][this.$['select'].selectedOptions[0].replicantIndex];
 		}
+		this['_cueRef'].file = { sum: file.sum, base: file.base, ext: file.ext, name: file.name, url: file.url }
 	}
 
 	_onSliderChange(e: any) {
