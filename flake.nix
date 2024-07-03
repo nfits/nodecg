@@ -20,10 +20,6 @@
     in
     {
       packages = forAllSystems (pkgs: rec {
-        typesCache = pkgs.fetchNpmDeps {
-          src = "${self}/generated-types";
-          hash = "sha256-i0+dE2ZYlAhBIRHO3oqtNq/EIb29WZoio3rN//whfIk=";
-        };
 
         nodecg-cli = with pkgs; stdenv.mkDerivation rec {
           pname = "nodecg-cli";
@@ -43,6 +39,10 @@
             npmHooks.npmInstallHook
             npmHooks.npmBuildHook
           ];
+
+          meta = {
+            mainProgram = "nodecg";
+          };
         };
 
         default =
@@ -75,18 +75,32 @@
                 --run 'export NODECG_ROOT=''${NODECG_ROOT-''${XDG_STATE_DIR-~/.local/state}/nodecg}; mkdir -p $NODECG_ROOT'
             '';
 
-            buildPhase = ''
-              npm run build:tsc
-              npm run build:client
-              npm run build:copy-templates
-              npm run build:types --cache ${typesCache}
-            '';
+            buildPhase =
+              let
+                typesCache = pkgs.fetchNpmDeps {
+                  src = "${self}/generated-types";
+                  hash = "sha256-i0+dE2ZYlAhBIRHO3oqtNq/EIb29WZoio3rN//whfIk=";
+                };
+              in
+              ''
+                npm run build:tsc
+                npm run build:client
+                npm run build:copy-templates
+                npm run build:types --cache ${typesCache}
+              '';
 
             meta = {
               mainProgram = "nodecg-server";
             };
-
           };
+      });
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.mkShell (with self.packages.${pkgs.system}; {
+          buildInputs = [
+            nodecg-cli
+            default
+          ];
+        });
       });
       formatter = forAllSystems (pkgs: pkgs.nixpkgs-fmt);
     };
