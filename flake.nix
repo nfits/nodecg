@@ -19,9 +19,8 @@
           }));
     in
     {
-      packages = forAllSystems (pkgs: rec {
-
-        nodecg-cli = with pkgs; stdenv.mkDerivation rec {
+      overlays.default = final: prev: rec {
+        nodecg-cli = with final; stdenv.mkDerivation rec {
           pname = "nodecg-cli";
           version = nodecg-cli-src.shortRev or nodecg-cli-src.dirtyShortRev or nodecg-cli-src.lastModified or "unknown";
           src = nodecg-cli-src;
@@ -44,9 +43,8 @@
             mainProgram = "nodecg";
           };
         };
-
-        default =
-          with pkgs; stdenv.mkDerivation rec {
+        nodecg-server =
+          with final; stdenv.mkDerivation rec {
             pname = "nodecg-server";
             version = self.shortRev or self.dirtyShortRev or self.lastModified or "unknown";
             src = self;
@@ -93,12 +91,13 @@
               mainProgram = "nodecg-server";
             };
           };
-      });
+      };
+      packages = forAllSystems (pkgs: self.overlays.default pkgs pkgs);
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell (with self.packages.${pkgs.system}; {
           buildInputs = [
             nodecg-cli
-            default
+            nodecg-server
           ];
         });
       });
