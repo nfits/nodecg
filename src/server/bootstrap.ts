@@ -11,14 +11,14 @@
 
 import semver from 'semver';
 import fetch from 'node-fetch-commonjs';
-import { nodecgRootPath } from '../shared/utils/rootPath';
+import { NODECG_ROOT } from './nodecg-root';
 
 const cwd = process.cwd();
 
-if (cwd !== nodecgRootPath) {
-	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, nodecgRootPath);
-	process.chdir(nodecgRootPath);
-	console.info('[nodecg] Changed process.cwd to %s', nodecgRootPath);
+if (cwd !== NODECG_ROOT) {
+	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, NODECG_ROOT);
+	process.chdir(NODECG_ROOT);
+	console.info('[nodecg] Changed process.cwd to %s', NODECG_ROOT);
 }
 
 import { pjson, asyncExitHook } from './util';

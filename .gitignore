@@ -62,3 +62,6 @@ tmp_node_modules
 
 # release asset
 /*.tgz
+
+# nix build result
+result
