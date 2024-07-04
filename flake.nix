@@ -65,6 +65,7 @@
               npmHooks.npmConfigHook
               npmHooks.npmInstallHook
               makeWrapper
+              breakpointHook
             ];
 
             postInstall = ''
@@ -84,7 +85,11 @@
                 npm run build:tsc
                 npm run build:client
                 npm run build:copy-templates
-                npm run build:types --cache ${typesCache}
+                pushd generated-types
+                npm ci --cache ${typesCache}
+                patchShebangs node_modules
+                npx tsc
+                popd
               '';
 
             meta = {
